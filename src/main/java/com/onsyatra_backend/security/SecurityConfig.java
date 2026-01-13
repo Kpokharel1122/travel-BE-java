@@ -21,7 +21,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**", "/health", "/public/**").permitAll()
+                        .requestMatchers("/actuator/**", "/health", "/public/**", "/submitContact").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
