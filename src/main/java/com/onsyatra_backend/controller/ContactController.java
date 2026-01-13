@@ -14,7 +14,7 @@ public class ContactController {
     @Autowired
     private ContactService contactService;
 
-    @PostMapping("/submitContact")
+    @PostMapping("/contact/submitContact")
     public ResponseEntity<?> postContact(@RequestBody ContactDto contactDto){
         contactService.postContact(contactDto);
         return ResponseEntity.ok("Contact Form submitted successfully");

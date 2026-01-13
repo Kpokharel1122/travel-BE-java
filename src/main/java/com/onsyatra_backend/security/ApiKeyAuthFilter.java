@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class ApiKeyAuthFilter extends OncePerRequestFilter {
@@ -21,12 +22,28 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
     private static final String HEADER_NAME = "Authorization";
 
+    // Public endpoints that should skip API key check
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/contact", "/public", "/health", "/actuator"
+    );
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        // Remove context path for correct matching
+        String path = request.getRequestURI().substring(request.getContextPath().length());
+
+        // Skip API key check for public endpoints
+        boolean isPublic = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+        if (isPublic) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Existing API key check
         String headerValue = request.getHeader(HEADER_NAME);
 
         System.out.println("[ApiKeyAuthFilter] Incoming Authorization header: " + headerValue);

@@ -19,27 +19,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // Disable CSRF since this is a REST API
                 .csrf(csrf -> csrf.disable())
+
+                // Configure authorization
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**", "/health", "/public/**", "/submitContact").permitAll()
+                        // Public endpoints
+                        .requestMatchers("/actuator/**", "/health", "/public/**", "/contact/**").permitAll()
+                        // Everything else requires authentication (API key)
                         .anyRequest().authenticated()
                 )
+
+                // Handle exceptions with JSON responses
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, ex1) -> {
                             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             res.setContentType("application/json");
                             res.getWriter().write("""
-                            {"success":false,"status":401,"message":"Unauthorized"}
-                        """);
+                        {"success":false,"status":401,"message":"Unauthorized"}
+                    """);
                         })
                         .accessDeniedHandler((req, res, ex2) -> {
                             res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             res.setContentType("application/json");
                             res.getWriter().write("""
-                            {"success":false,"status":403,"message":"Forbidden"}
-                        """);
+                        {"success":false,"status":403,"message":"Forbidden"}
+                    """);
                         })
                 )
+
+                // Add the API key filter before UsernamePasswordAuthenticationFilter
                 .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
