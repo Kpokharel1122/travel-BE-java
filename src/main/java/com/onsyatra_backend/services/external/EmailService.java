@@ -20,7 +20,7 @@ public class EmailService {
 
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setTo("info@onsyatra.com");
+            helper.setTo("krishnapokharel.2022@gmail.com");
 //            info@onsyatra.com
             helper.setSubject("Contact Form Enquiries of ONS Yatra");
             helper.setFrom("krishnapokharel.2022@gmail.com");
